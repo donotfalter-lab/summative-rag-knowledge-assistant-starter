@@ -7,7 +7,7 @@ def main():
     """
     Load the provided knowledge base and store document chunks in Chroma.
 
-    Complete the TODOs in vector_store.py before running this script.
+    Run this again whenever the knowledge base files change; upsert keeps it idempotent.
     """
     documents = load_text_documents(Config.KNOWLEDGE_BASE_PATH)
     chunks = build_chunks(documents)

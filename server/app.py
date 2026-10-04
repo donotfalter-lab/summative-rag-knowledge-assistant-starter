@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -24,7 +25,7 @@ def ask_question():
     """
     Receive a question from the frontend and return an answer with sources.
 
-    TODO:
+    Steps:
     - Read JSON from the request body.
     - Validate that the question exists and is not blank.
     - Call answer_question(question).
@@ -32,33 +33,35 @@ def ask_question():
     - Return a helpful error response if the question is missing.
     """
     data = request.get_json(silent=True) or {}
-    question = data.get("question", "").strip()
+    question = data.get("question", "")
+    question = question.strip() if isinstance(question, str) else ""
 
     if not question:
         return jsonify({"error": "Question is required."}), 400
 
-    # TODO:
-    # Replace this starter response by calling answer_question(question).
-    #
-    # Expected return shape:
-    # {
-    #     "answer": "...",
-    #     "sources": [...]
-    # }
-    #
-    # Example:
-    # result = answer_question(question)
-    # return jsonify(result), 200
+    try:
+        result = answer_question(question)
+    except requests.exceptions.RequestException:
+        app.logger.exception("Model service request failed.")
+        return jsonify(
+            {
+                "error": (
+                    "Could not reach the model service. Confirm Ollama is running "
+                    f"at {Config.OLLAMA_BASE_URL} and the configured models are pulled."
+                ),
+                "sources": [],
+            }
+        ), 503
+    except Exception:
+        app.logger.exception("RAG workflow failed.")
+        return jsonify(
+            {
+                "error": "Something went wrong while generating an answer.",
+                "sources": [],
+            }
+        ), 500
 
-    return jsonify(
-        {
-            "error": (
-                "The /api/ask route is connected, but the RAG workflow is not implemented yet. "
-                "Complete the TODO in server/app.py."
-            ),
-            "sources": [],
-        }
-    ), 501
+    return jsonify(result), 200
 
 
 if __name__ == "__main__":

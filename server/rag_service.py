@@ -62,7 +62,9 @@ Use only the provided context to answer the user's question.
 If the context does not contain enough information, say that you do not have enough information from the knowledge base.
 
 Keep the answer clear and practical.
+Only include steps that apply to the situation in the question. Do not combine steps that the context gives for a different situation.
 Do not invent policies, steps, or facts that are not supported by the context.
+Mention the title of the source your answer is based on.
 
 Context:
 {context}
@@ -78,7 +80,7 @@ def call_generation_model(prompt: str) -> str:
     """
     Send the final prompt to the configured generation model.
 
-    TODO:
+    Steps:
     - Send a POST request to the Ollama generation endpoint.
     - Use Config.OLLAMA_BASE_URL.
     - Use Config.GENERATION_MODEL.
@@ -99,7 +101,19 @@ def call_generation_model(prompt: str) -> str:
             }
         }
     """
-    raise NotImplementedError("TODO: Call the configured generation model.")
+    response = requests.post(
+        f"{Config.OLLAMA_BASE_URL}/api/generate",
+        json={
+            "model": Config.GENERATION_MODEL,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": Config.TEMPERATURE},
+        },
+        timeout=120,
+    )
+    response.raise_for_status()
+
+    return response.json().get("response", "").strip()
 
 
 def format_sources(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -119,6 +133,7 @@ def format_sources(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "title": chunk.get("title", "Unknown Source"),
                 "source": chunk.get("source", "unknown"),
                 "chunk_index": chunk.get("chunk_index"),
+                "distance": round(chunk["distance"], 3) if "distance" in chunk else None,
                 "excerpt": excerpt,
             }
         )

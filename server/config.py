@@ -16,6 +16,7 @@ class Config:
     KNOWLEDGE_BASE_PATH = os.getenv("KNOWLEDGE_BASE_PATH", "./knowledge_base")
 
     TOP_K = int(os.getenv("TOP_K", "3"))
+    MAX_DISTANCE = float(os.getenv("MAX_DISTANCE", "0.5"))
     TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))
 
     CLIENT_ORIGIN = os.getenv("CLIENT_ORIGIN", "http://localhost:5173")
