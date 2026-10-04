@@ -169,6 +169,10 @@ h2 {
   line-height: 1.7;
 }
 
+.answer-text {
+  white-space: pre-wrap;
+}
+
 .source-list {
   display: grid;
   gap: 12px;

@@ -4,7 +4,8 @@ const SAMPLE_QUESTIONS = [
   "What should I do if I cannot log into the product dashboard?",
   "Why are source-backed answers important?",
   "What should employees do with suspicious emails?",
-  "What should a support agent do if the knowledge base does not answer a question?"
+  "What should a support agent do if the knowledge base does not answer a question?",
+  "What should a new employee complete during the first week?"
 ];
 
 export default function App() {
@@ -81,11 +82,12 @@ export default function App() {
   return (
     <main className="page-shell">
       <section className="hero">
-        <p className="eyebrow">Summative Lab Starter</p>
+        <p className="eyebrow">Internal Knowledge Assistant</p>
         <h1>Local RAG-Powered Knowledge Assistant</h1>
         <p>
-          Complete the Flask backend and RAG workflow so this interface can return
-          source-backed answers from the provided knowledge base.
+          Ask questions about onboarding, product support, security, and workplace
+          processes. Answers are generated from the approved knowledge base and
+          include the sources they came from.
         </p>
         <div className="status-card">
           <span className="status-dot" />
@@ -129,7 +131,7 @@ export default function App() {
         {answer && (
           <section className="response-section">
             <h2>Answer</h2>
-            <p>{answer}</p>
+            <p className="answer-text">{answer}</p>
           </section>
         )}
 
@@ -140,7 +142,11 @@ export default function App() {
               {sources.map((source, index) => (
                 <article className="source-card" key={`${source.source}-${index}`}>
                   <h3>{source.title || "Unknown Source"}</h3>
-                  <p className="source-file">{source.source}</p>
+                  <p className="source-file">
+                    {source.source}
+                    {source.chunk_index !== undefined && source.chunk_index !== null &&
+                      ` · chunk ${source.chunk_index}`}
+                  </p>
                   <p>{source.excerpt}</p>
                 </article>
               ))}
